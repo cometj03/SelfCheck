@@ -83,11 +83,13 @@ def StartCheck(school_level, school_name, NAME, BIRTH, PW):
         except NoSuchElementException:
                 print('\n사이트 구조가 변경된 것 같습니다.')
                 print('개발자에게 문의해주세요 :)')
+                driver.quit()
                 return
         except BaseException as e:
                 print(e)
                 print('\n사이트를 불러오면서 오류가 발생했습니다')
                 print('info.txt 파일을 확인하고 다시 실행해주세요.')
+                driver.quit()
                 return
 
         if path.exists('confirm.png'):
@@ -97,8 +99,6 @@ def StartCheck(school_level, school_name, NAME, BIRTH, PW):
         print('자가진단 완료! (confirm.png)')
         driver.quit()
 
-        os.system("pause")
-        os._exit(0)
 
 
 def CreateFile():
@@ -131,8 +131,10 @@ if path.exists('chromedriver.exe'):
                 StartCheck(level, school, name, birth, pw)
         else:
                 CreateFile()
+                print('정보가 저장되었습니다. 프로그램을 다시 실행하시면 자가진단이 시작됩니다.')
 
 else:
         print('크롬드라이버를 실행파일과 같은 폴더에 설치해주세요\n(https://github.com/XxCtrlZxX/SelfCheck)')
-        os.system("pause")
-        os._exit(0)
+
+os.system("pause")
+os._exit(0)
