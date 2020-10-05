@@ -7,7 +7,7 @@ from os import path
 import os
 import time
 
-# To Build : pyinstaller --onefile SelfCheck.py
+# To Build : pyinstaller --icon=check_icon.ico --onefile SelfCheck.py
 
 mainlink = 'https://hcs.eduro.go.kr'
 
@@ -84,12 +84,13 @@ def StartCheck(school_level, school_name, NAME, BIRTH, PW):
         except NoSuchElementException:
                 print('\n사이트 구조가 변경된 것 같습니다.')
                 print('개발자에게 문의해주세요 :)')
+                print('\n19sunrin153@sunrint.hs.kr\n')
                 driver.quit()
                 return
         except BaseException as e:
                 print(e)
-                print('\n사이트를 불러오면서 오류가 발생했습니다')
-                print('info.txt 파일을 확인하고 다시 실행해주세요.')
+                print('사이트를 불러오는도중 오류가 발생했습니다')
+                print('info.txt 파일을 확인하고 다시 실행해주세요.\n')
                 driver.quit()
                 return
 
