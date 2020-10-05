@@ -25,6 +25,8 @@ def StartCheck(school_level, school_name, NAME, BIRTH, PW):
         # driver = webdriver.Chrome('./chromedriver.exe') 옵션 적용 안함
 
         try:
+                print('사이트에 접속중...')
+
                 driver.get(mainlink)
 
                 ### Main ###
@@ -89,8 +91,13 @@ def StartCheck(school_level, school_name, NAME, BIRTH, PW):
                 return
         except BaseException as e:
                 print(e)
-                print('사이트를 불러오는도중 오류가 발생했습니다')
-                print('info.txt 파일을 확인하고 다시 실행해주세요.\n')
+                print('사이트를 불러오는 도중 오류가 발생했습니다')
+                reset = input('정보 초기화 (y/n) >> ')
+                if (reset in 'y'):
+                        os.remove('info.txt')
+                        print('초기화되었습니다.')
+                else:
+                        print('info.txt의 정보가 정확한지 확인 후 다시 실행해주세요.\n')
                 driver.quit()
                 return
 
