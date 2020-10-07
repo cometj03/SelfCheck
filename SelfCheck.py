@@ -25,14 +25,12 @@ def StartCheck(school_level, school_name, NAME, BIRTH, PW):
         # driver = webdriver.Chrome('./chromedriver.exe') 옵션 적용 안함
 
         try:
-                print('사이트에 접속중...')
+                print('사이트 접속중 :', mainlink)
 
                 driver.get(mainlink)
 
                 ### Main ###
                 driver.implicitly_wait(3)
-                # closeBtn = driver.find_element(By.CLASS_NAME, 'closeBtn')
-                # if (closeBtn):  closeBtn.click()
                 driver.find_element(By.ID, 'btnConfirm2').click()
                 driver.implicitly_wait(3)
 
@@ -70,7 +68,7 @@ def StartCheck(school_level, school_name, NAME, BIRTH, PW):
                 time.sleep(0.5)
                 driver.find_elements(By.CLASS_NAME, 'input_text_common')[0].send_keys(PW)
                 driver.find_element(By.ID, 'btnConfirm').click()
-                time.sleep(1)
+                time.sleep(0.7)
 
                 ### 진단 참여 창 ###
                 driver.find_element(By.CLASS_NAME, 'btn').click()
@@ -91,19 +89,15 @@ def StartCheck(school_level, school_name, NAME, BIRTH, PW):
                 return
         except BaseException as e:
                 print(e)
-                print('사이트를 불러오는 도중 오류가 발생했습니다')
-                reset = input('정보 초기화 (y/n) >> ')
-                if (reset in 'y'):
-                        os.remove('info.txt')
-                        print('초기화되었습니다.')
-                else:
-                        print('info.txt의 정보가 정확한지 확인 후 다시 실행해주세요.\n')
+                print('사이트를 불러오지 못했습니다.')
+                print('입력된 정보가 정확하지 않거나')
+                print('연속해서 자가진단을 진행해도 이 문구가 뜰 수 있습니다.\n')
                 driver.quit()
                 return
 
         if path.exists('confirm.png'):
                 os.remove('confirm.png')
-        driver.get_screenshot_as_file('confirm.png')
+        driver.save_screenshot('confirm.png')
 
         print('자가진단 완료! (confirm.png)')
         driver.quit()
@@ -144,7 +138,8 @@ if path.exists('chromedriver.exe'):
                 print('정보가 저장되었습니다. 프로그램을 다시 실행하시면 자가진단이 시작됩니다.')
 
 else:
-        print('크롬드라이버를 실행파일과 같은 폴더에 설치해주세요\n(https://github.com/XxCtrlZxX/SelfCheck)')
+        print('크롬드라이버를 실행파일과 같은 폴더에 설치해주세요')
+        print('참고 : https://github.com/XxCtrlZxX/SelfCheck\n')
 
 os.system("pause")
 os._exit(0)
