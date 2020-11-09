@@ -22,7 +22,7 @@ def StartCheck(school_level, school_name, NAME, BIRTH, PW):
         options.add_argument("lang=ko_KR") # 한국어
 
         driver = webdriver.Chrome('./chromedriver.exe', options=options)
-        # driver = webdriver.Chrome('./chromedriver.exe') 옵션 적용 안함
+        # driver = webdriver.Chrome('./chromedriver.exe') # 옵션 적용 안함
 
         try:
                 print('사이트 접속중 :', mainlink)
@@ -76,7 +76,7 @@ def StartCheck(school_level, school_name, NAME, BIRTH, PW):
 
                 ### SELF CHECK ###
                 print('진단 체크중...')
-                for i in range(1, 6):
+                for i in range(1, 4):
                         xpath = '//*[@id="container"]/div/div/div[2]/div[2]/dl[{0}]/dd/ul/li[1]/label'.format(i)
                         driver.find_element_by_xpath(xpath).click()
                 driver.find_element(By.ID, 'btnConfirm').click()
