@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
+from chromedriver_autoinstaller import install as installDriver
 from os import path
 
 import os
@@ -12,20 +13,23 @@ import time
 mainlink = 'https://hcs.eduro.go.kr'
 
 
-def StartCheck(school_level, school_name, NAME, BIRTH, PW):
+def StartCheck(driverPath, school_level, school_name, NAME, BIRTH, PW):
+
+        print('자가진단 시작')
+        
         options = webdriver.ChromeOptions()
-        #options.add_argument('headless')      # 크롬창 안 뜨게
+        options.add_argument('headless')      # 크롬창 안 뜨게
         options.add_argument('window-size=1920x1080')
         options.add_argument('--disable-gpu')
         options.add_argument('user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')
         options.add_experimental_option('excludeSwitches', ['enable-logging'])
         options.add_argument("lang=ko_KR") # 한국어
 
-        driver = webdriver.Chrome('./chromedriver.exe', options=options)
+        driver = webdriver.Chrome(executable_path=driverPath, options=options)
         # driver = webdriver.Chrome('./chromedriver.exe') # 옵션 적용 안함
 
         try:
-                print('사이트 접속중 :', mainlink)
+                print(f'사이트 접속중 : {mainlink}')
 
                 driver.get(mainlink)
 
@@ -82,18 +86,19 @@ def StartCheck(school_level, school_name, NAME, BIRTH, PW):
                 driver.find_element(By.ID, 'btnConfirm').click()
 
         except NoSuchElementException:
-                print('\n사이트 구조가 변경된 것 같습니다.')
-                print('개발자에게 문의해주세요 :)')
-                print('\n19sunrin153@sunrint.hs.kr\n')
+                print('''
+        사이트 구조가 변경된 것 같습니다.
+        개발자에게 문의해주세요 :)
+        19sunrin153@sunrint.hs.kr\n''')
                 driver.quit()
                 return
         except BaseException as e:
                 print()
                 print(e)
                 print('''
-                사이트를 불러오지 못했습니다.
-                입력된 정보가 정확하지 않거나
-                연속해서 자가진단을 진행해도 이 문구가 뜰 수 있습니다.\n''')
+        사이트를 불러오지 못했습니다.
+        입력된 정보가 정확하지 않거나
+        연속해서 자가진단을 진행해도 이 문구가 뜰 수 있습니다.\n''')
                 driver.quit()
                 return
 
@@ -121,27 +126,42 @@ def LoadFile():
         with open('info.txt', 'r', encoding='utf8') as file:
                 return file.readlines()
 
+def AppendFile(text):
+        with open('info.txt', 'a', encoding='utf8') as file:
+                file.write(text)
+
 
 # program start
-if path.exists('chromedriver.exe'):
-        if path.exists('info.txt'):
+def Main():
+        if path.exists('./info.txt'):
+                
                 info = LoadFile()
+                chromeDriverPath = './chromedriver.exe'
+                
+                if not path.exists(chromeDriverPath): # 크롬드라이버 파일이 존재하지 않을 때
 
-                level = info[0][:-1]
-                school = info[1][:-1]
-                name = info[2][:-1]
-                birth = info[3][:-1]
-                pw = info[4][:-1]
+                        if len(info) >= 6:
+                                chromeDriverPath = installDriver()
+                        else:
+                                a = input('\n크롬드라이버가 존재하지 않습니다.\n자동으로 최신버전을 다운받으시겠습니까? (y/n) : ')
+                                
+                                if a == 'y' or a == 'Y':
+                                        chromeDriverPath = installDriver()
+                                        AppendFile(f'{chromeDriverPath}\n')
+                                        print(f'드라이버 설치 완료 (다운로드 경로 : {chromeDriverPath})')
+                                else:
+                                        print('\n크롬드라이버를 실행파일과 같은 폴더에 설치해주세요. (https://github.com/XxCtrlZxX/SelfCheck 참고)\n')
+                                        return
 
-                print('자가진단 시작')
-                StartCheck(level, school, name, birth, pw)
+                level, school, name, birth, pw = info[0][:-1], info[1][:-1], info[2][:-1], info[3][:-1], info[4][:-1]
+
+                StartCheck(chromeDriverPath, level, school, name, birth, pw)
+
         else:
-                CreateFile()
-                print('정보가 저장되었습니다. 프로그램을 다시 실행하시면 자가진단이 시작됩니다.')
+                CreateFile()    # info.txt 파일 생성 후 종료
+                print('\n정보가 저장되었습니다. 프로그램을 다시 실행하시면 자가진단이 시작됩니다.\n')
 
-else:
-        print('크롬드라이버를 실행파일과 같은 폴더에 설치해주세요')
-        print('참고 : https://github.com/XxCtrlZxX/SelfCheck\n')
+Main()
 
 os.system("pause")
 os._exit(0)
