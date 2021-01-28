@@ -14,7 +14,7 @@ mainlink = 'https://hcs.eduro.go.kr'
 
 def StartCheck(school_level, school_name, NAME, BIRTH, PW):
         options = webdriver.ChromeOptions()
-        options.add_argument('headless')      # 크롬창 안 뜨게
+        #options.add_argument('headless')      # 크롬창 안 뜨게
         options.add_argument('window-size=1920x1080')
         options.add_argument('--disable-gpu')
         options.add_argument('user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')
@@ -51,9 +51,9 @@ def StartCheck(school_level, school_name, NAME, BIRTH, PW):
                 input_schoolName.send_keys(school_name)
                 input_schoolName.send_keys(Keys.ENTER)
                 driver.implicitly_wait(3)
-                # 학교 선택
-                driver.find_element_by_xpath('//*[@id="softBoardListLayer"]/div[2]/div[1]/ul/li/p/a').click()
-                # 찾기 완료 버튼
+                # 검색된 학교 선택
+                driver.find_element_by_xpath('//*[@id="softBoardListLayer"]/div[2]/div[1]/ul/li/a/p/a').click()
+                # 선택 완료 버튼
                 driver.find_element_by_xpath('//*[@id="softBoardListLayer"]/div[2]/div[2]/input').click()
 
                 ### Login ###
@@ -77,7 +77,7 @@ def StartCheck(school_level, school_name, NAME, BIRTH, PW):
                 ### SELF CHECK ###
                 print('진단 체크중...')
                 for i in range(1, 4):
-                        xpath = '//*[@id="container"]/div/div/div[2]/div[2]/dl[{0}]/dd/ul/li[1]/label'.format(i)
+                        xpath = f'//*[@id="container"]/div/div/div[2]/div[2]/dl[{i}]/dd/ul/li[1]/label'
                         driver.find_element_by_xpath(xpath).click()
                 driver.find_element(By.ID, 'btnConfirm').click()
 
@@ -88,10 +88,12 @@ def StartCheck(school_level, school_name, NAME, BIRTH, PW):
                 driver.quit()
                 return
         except BaseException as e:
+                print()
                 print(e)
-                print('사이트를 불러오지 못했습니다.')
-                print('입력된 정보가 정확하지 않거나')
-                print('연속해서 자가진단을 진행해도 이 문구가 뜰 수 있습니다.\n')
+                print('''
+                사이트를 불러오지 못했습니다.
+                입력된 정보가 정확하지 않거나
+                연속해서 자가진단을 진행해도 이 문구가 뜰 수 있습니다.\n''')
                 driver.quit()
                 return
 
