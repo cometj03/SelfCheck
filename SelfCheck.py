@@ -2,9 +2,9 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
-import chromedriver_autoinstaller as autoinstaller
 from os import path
 
+import chromedriver_autoinstaller as autoinstaller
 import os
 import time
 
@@ -86,6 +86,7 @@ def StartCheck(driverPath, school_level, school_name, NAME, BIRTH, PW):
             xpath = f'//*[@id="container"]/div/div/div[2]/div[2]/dl[{i}]/dd/ul/li[1]/label'
             driver.find_element_by_xpath(xpath).click()
         driver.find_element(By.ID, 'btnConfirm').click()
+        driver.implicitly_wait(3)
 
     except NoSuchElementException:
         print('''
@@ -104,11 +105,17 @@ def StartCheck(driverPath, school_level, school_name, NAME, BIRTH, PW):
         driver.quit()
         return
 
-    if path.exists('confirm.png'):
-        os.remove('confirm.png')
-    driver.save_screenshot('confirm.png')
+    i = 'confirm.png'
+    if path.exists(i):
+        os.remove(i)
+    driver.save_screenshot(i)
 
-    print('자가진단 완료! (confirm.png)')
+    print(f'자가진단 완료! ({i})')
+
+    # -> file is TOO large..
+    # from PIL import Image
+    # confirmImg = Image.open(i)
+    # confirmImg.show()
     driver.quit()
 
 
@@ -152,7 +159,7 @@ def Main():
     if path.exists('./info.txt'):
 
         info = LoadFile()
-        chromeDriverPath = info[len(info) - 1][-1]  # 마지막줄
+        chromeDriverPath = info[len(info) - 1][:-1]  # 마지막줄
 
         if not path.exists(chromeDriverPath):  # 크롬드라이버 파일이 존재하지 않을 때
             a = input('\n크롬드라이버가 존재하지 않습니다.\n자동으로 최신버전을 다운받으시겠습니까? (y/n) : ')
