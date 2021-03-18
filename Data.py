@@ -1,11 +1,12 @@
-class Data:
-    def __init__(self):
-        self.school = ""
+import json
 
-    def get(self):
-        json_data = {}
-        self.school_level = json_data['school_level']
-        self.school_name = json_data['school_name']
-        self.name = json_data['name']
-        self.birth = json_data['birth']
-        self.password = json_data['password']
+# create or modify json file
+json_data = {'asdhf': 123, 'test': 'tttt'}
+
+with open('./info.json', 'w', encoding='utf-8') as f:
+    json.dump(json_data, f, indent='\t')
+
+# load json file
+with open('./info.json', 'r', encoding='utf-8') as f:
+    json_data = json.load(f)
+    print(json.dumps(json_data, indent='\t'))
