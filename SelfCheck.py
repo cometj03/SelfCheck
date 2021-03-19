@@ -47,13 +47,14 @@ def StartCheck(info):
 
         ### 학교 선택창 ###
         print('학교 선택중...')
-        # 지역 선택 : 서울특별시
+        # 지역 선택
+        tmp = info.cities + 1
         driver.find_element_by_xpath(
-            '//*[@id="softBoardListLayer"]/div[2]/div[1]/table/tbody/tr[1]/td/select/option[2]').click()
+            f'//*[@id="softBoardListLayer"]/div[2]/div[1]/table/tbody/tr[1]/td/select/option[{tmp}]').click()
         # 학교급 선택
-        num = str(int(info.school_level) + 1)
+        tmp = info.school_level + 1
         driver.find_element_by_xpath(
-            '//*[@id="softBoardListLayer"]/div[2]/div[1]/table/tbody/tr[2]/td/select/option[' + num + ']').click()
+            f'//*[@id="softBoardListLayer"]/div[2]/div[1]/table/tbody/tr[2]/td/select/option[{tmp}]').click()
         # 학교명 입력
         input_schoolName = driver.find_element(By.CLASS_NAME, 'searchArea')
         input_schoolName.send_keys(info.school_name)
@@ -78,7 +79,7 @@ def StartCheck(info):
         driver.find_element(By.ID, 'btnConfirm').click()
 
         print('진단 창 불러오는 중...')
-        time.sleep(1.5) # more sleep
+        time.sleep(1.7) # more sleep
 
         ### 진단 참여 창 ###
         driver.find_element(By.CLASS_NAME, 'btn').click()
@@ -99,12 +100,19 @@ def StartCheck(info):
         19sunrin153@sunrint.hs.kr\n''')
         driver.quit()
         return
+    except AttributeError:
+        print('''
+        정보가 잘못 입력된 것 같아요.
+        info.json 파일을 열어서 정보를 확인하고 수정하거나,
+        파일을 삭제하여 다시 생성해주세요 :)
+        ''')
+        driver.quit()
+        return
     except BaseException as e:
         print()
-        print(e)
+        print(e, type(e))
         print('''
-        사이트를 불러오지 못했습니다.
-        입력된 정보가 정확하지 않거나
+        사이트를 불러오는 중 오류가 발생했습니다.
         연속해서 자가진단을 진행해도 이 문구가 뜰 수 있습니다.
         
         또는 크롬 드라이버를 최신버전으로 업그레이드 해주세요.\n''')
@@ -151,12 +159,12 @@ def installDriver():
     try:
         driverPath = autoinstaller.install(cwd=True)
         # AppendFile(f'{driverPath}\n')
-        print(f'\n드라이버 설치 완료 (다운로드 경로 : {driverPath})\n')
+        print(f'드라이버 설치 완료 (다운로드 경로 : {driverPath})\n')
         return True, driverPath
 
     except Exception as e:
         print(e)
-        print('\n설치 중 문제가 생겼습니다 :( 다시 시도해주세요.')
+        print('설치 중 문제가 생겼습니다 :( 다시 시도해주세요.')
         return False, ''
 
 
@@ -203,6 +211,7 @@ def Main2():
             a = input('\n크롬드라이버가 존재하지 않습니다.\n자동으로 최신버전을 다운받으시겠습니까? (y/n) : ')
 
             if a in 'yY':
+                print('\n드라이버 설치중...')
                 success, downloadPath = installDriver()
                 if not success:
                     return
