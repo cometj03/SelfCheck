@@ -8,12 +8,14 @@ import chromedriver_autoinstaller as autoinstaller
 import os
 import time
 
+from Data import UserData
+
 # To Build : pyinstaller --icon=check_icon.ico --onefile SelfCheck.py
 
 mainlink = 'https://hcs.eduro.go.kr'
 
 
-def StartCheck(driverPath, school_level, school_name, NAME, BIRTH, PW):
+def StartCheck(info):
     print('자가진단 시작')
 
     options = webdriver.ChromeOptions()
@@ -25,8 +27,8 @@ def StartCheck(driverPath, school_level, school_name, NAME, BIRTH, PW):
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
     options.add_argument("lang=ko_KR")  # 한국어
 
-    driver = webdriver.Chrome(executable_path=driverPath, options=options)
-    # driver = webdriver.Chrome('./chromedriver.exe') # 옵션 적용 안함
+    driver = webdriver.Chrome(executable_path=info.driverPath, options=options)
+    # driver = webdriver.Chrome(info.driverPath) # 옵션 적용 안함
 
     try:
         print(f'사이트 접속중 : {mainlink}')
@@ -49,12 +51,12 @@ def StartCheck(driverPath, school_level, school_name, NAME, BIRTH, PW):
         driver.find_element_by_xpath(
             '//*[@id="softBoardListLayer"]/div[2]/div[1]/table/tbody/tr[1]/td/select/option[2]').click()
         # 학교급 선택
-        num = str(int(school_level) + 1)
+        num = str(int(info.school_level) + 1)
         driver.find_element_by_xpath(
             '//*[@id="softBoardListLayer"]/div[2]/div[1]/table/tbody/tr[2]/td/select/option[' + num + ']').click()
         # 학교명 입력
         input_schoolName = driver.find_element(By.CLASS_NAME, 'searchArea')
-        input_schoolName.send_keys(school_name)
+        input_schoolName.send_keys(info.school_name)
         input_schoolName.send_keys(Keys.ENTER)
         driver.implicitly_wait(3)
         # 검색된 학교 선택
@@ -63,8 +65,8 @@ def StartCheck(driverPath, school_level, school_name, NAME, BIRTH, PW):
         driver.find_element_by_xpath('//*[@id="softBoardListLayer"]/div[2]/div[2]/input').click()
 
         ### Login ###
-        input_text_common[1].send_keys(NAME)
-        input_text_common[2].send_keys(BIRTH)
+        input_text_common[1].send_keys(info.name)
+        input_text_common[2].send_keys(info.birth)
         driver.find_element(By.ID, 'btnConfirm').click()
         # driver.find_element(By.ID, 'btnConfirm').send_keys(Keys.ENTER)
 
@@ -72,9 +74,11 @@ def StartCheck(driverPath, school_level, school_name, NAME, BIRTH, PW):
         print('비밀번호 입력중...')
         driver.implicitly_wait(3)
         time.sleep(0.5)
-        driver.find_elements(By.CLASS_NAME, 'input_text_common')[0].send_keys(PW)
+        driver.find_elements(By.CLASS_NAME, 'input_text_common')[0].send_keys(info.password)
         driver.find_element(By.ID, 'btnConfirm').click()
-        time.sleep(0.7)
+
+        print('진단 창 불러오는 중...')
+        time.sleep(1.5) # more sleep
 
         ### 진단 참여 창 ###
         driver.find_element(By.CLASS_NAME, 'btn').click()
@@ -101,7 +105,9 @@ def StartCheck(driverPath, school_level, school_name, NAME, BIRTH, PW):
         print('''
         사이트를 불러오지 못했습니다.
         입력된 정보가 정확하지 않거나
-        연속해서 자가진단을 진행해도 이 문구가 뜰 수 있습니다.\n''')
+        연속해서 자가진단을 진행해도 이 문구가 뜰 수 있습니다.
+        
+        또는 크롬 드라이버를 최신버전으로 업그레이드 해주세요.\n''')
         driver.quit()
         return
 
@@ -119,33 +125,33 @@ def StartCheck(driverPath, school_level, school_name, NAME, BIRTH, PW):
     driver.quit()
 
 
-def CreateFile():
-    level = input('1: 유치원, 2: 초등학교, 3: 중학교, 4: 고등학교, 5: 특수학교\n(숫자 하나) >> ')
-    school = input('학교이름 (정확히) >> ')
-    name = input('이름 >> ')
-    birth = input('생년월일 (YYMMDD) >> ')
-    pw = input('로그인 비밀번호 (숫자 4자리) >> ')
+# def CreateFile():
+#     level = input('1: 유치원, 2: 초등학교, 3: 중학교, 4: 고등학교, 5: 특수학교\n(숫자 하나) >> ')
+#     school = input('학교이름 (정확히) >> ')
+#     name = input('이름 >> ')
+#     birth = input('생년월일 (YYMMDD) >> ')
+#     pw = input('로그인 비밀번호 (숫자 4자리) >> ')
 
-    with open('info.txt', 'w', encoding='utf8') as file:
-        info = [level + '\n', school + '\n', name + '\n', birth + '\n', pw + '\n', './chromedriver.exe\n']
-        file.writelines(info)
-
-
-def LoadFile():
-    with open('info.txt', 'r', encoding='utf8') as file:
-        return file.readlines()
+#     with open('info.txt', 'w', encoding='utf8') as file:
+#         info = [level + '\n', school + '\n', name + '\n', birth + '\n', pw + '\n', './chromedriver.exe\n']
+#         file.writelines(info)
 
 
-def AppendFile(text):
-    with open('info.txt', 'a', encoding='utf8') as file:
-        file.write(text)
+# def LoadFile():
+#     with open('info.txt', 'r', encoding='utf8') as file:
+#         return file.readlines()
+
+
+# def AppendFile(text):
+#     with open('info.txt', 'a', encoding='utf8') as file:
+#         file.write(text)
 
 
 def installDriver():
     try:
         driverPath = autoinstaller.install(cwd=True)
-        AppendFile(f'{driverPath}\n')
-        print(f'드라이버 설치 완료 (다운로드 경로 : {driverPath})')
+        # AppendFile(f'{driverPath}\n')
+        print(f'\n드라이버 설치 완료 (다운로드 경로 : {driverPath})\n')
         return True, driverPath
 
     except Exception as e:
@@ -154,34 +160,65 @@ def installDriver():
         return False, ''
 
 
+# def Main():
+#     if path.exists('./info.txt'):
+
+#         info = LoadFile()
+#         chromeDriverPath = info[len(info) - 1][:-1]  # 마지막줄
+
+#         if not path.exists(chromeDriverPath):  # 크롬드라이버 파일이 존재하지 않을 때
+#             a = input('\n크롬드라이버가 존재하지 않습니다.\n자동으로 최신버전을 다운받으시겠습니까? (y/n) : ')
+
+#             if a in 'yY':
+#                 success, chromeDriverPath = installDriver()
+#                 if not success:
+#                     return
+#             else:
+#                 print('\n크롬드라이버를 실행파일과 같은 폴더에 설치해주세요. (https://github.com/XxCtrlZxX/SelfCheck 참고)\n')
+#                 return
+
+#         level, school, name, birth, pw = info[0][:-1], info[1][:-1], info[2][:-1], info[3][:-1], info[4][:-1]
+
+#         StartCheck(chromeDriverPath, level, school, name, birth, pw)
+
+#     else:
+#         CreateFile()  # info.txt 파일 생성 후 종료
+#         print('\n정보가 저장되었습니다. 프로그램을 다시 실행하시면 자가진단이 시작됩니다.\n')
+
+
+#######----########
+
 # program start
-def Main():
-    if path.exists('./info.txt'):
+def Main2():
+    info = UserData()
 
-        info = LoadFile()
-        chromeDriverPath = info[len(info) - 1][:-1]  # 마지막줄
+    if not path.exists('./info.json'):  # info.json 파일 존재하지 않을 때
+        info.init()
+        print('\ninfo.json 파일에 정보가 저장되었습니다.\n프로그램을 다시 실행하시면 자동으로 자가진단이 시작됩니다.\n')
 
-        if not path.exists(chromeDriverPath):  # 크롬드라이버 파일이 존재하지 않을 때
+    else:
+        info.getData()
+
+        if not path.exists(info.driverPath):  # 크롬드라이버 파일이 존재하지 않을 때
             a = input('\n크롬드라이버가 존재하지 않습니다.\n자동으로 최신버전을 다운받으시겠습니까? (y/n) : ')
 
             if a in 'yY':
-                success, chromeDriverPath = installDriver()
+                success, downloadPath = installDriver()
                 if not success:
                     return
+                
+                info.modifyDriverPath(downloadPath) # 다운로드 경로 수정
+
             else:
                 print('\n크롬드라이버를 실행파일과 같은 폴더에 설치해주세요. (https://github.com/XxCtrlZxX/SelfCheck 참고)\n')
                 return
 
-        level, school, name, birth, pw = info[0][:-1], info[1][:-1], info[2][:-1], info[3][:-1], info[4][:-1]
+        # 자가진단 시작
+        StartCheck(info)
+                    
+        
 
-        StartCheck(chromeDriverPath, level, school, name, birth, pw)
-
-    else:
-        CreateFile()  # info.txt 파일 생성 후 종료
-        print('\n정보가 저장되었습니다. 프로그램을 다시 실행하시면 자가진단이 시작됩니다.\n')
-
-
-Main()
+Main2()
 
 os.system("pause")
 os._exit(0)
